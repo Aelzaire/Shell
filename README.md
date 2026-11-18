@@ -36,6 +36,14 @@ Features
 * No limitations.
 
 
+Windows 11 modernization
+------------------
+This branch updates Shell for current Windows 11 builds (24H2/25H2): a working
+"Edit with Notepad++", complete "Send to" and "New" submenus, Windows 11-style
+"Compress to" and "Extract" commands, and a default menu that keeps every
+Windows command, so "Show more options" is never needed. See
+[CHANGELOG-win11.md](CHANGELOG-win11.md) for the full list.
+
 Requirements
 ------------------
   * Microsoft Windows 7/8/10/11 
