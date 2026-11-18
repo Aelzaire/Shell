@@ -2,9 +2,10 @@ name: Build
 
 on:
   push:
-    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  # Lets you start a build by hand from the Actions tab.
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -23,7 +24,7 @@ jobs:
       SOLUTION_FILE_PATH: src/Shell.sln
       BUILD_CONFIGURATION: ${{matrix.configuration}}
       BUILD_PLATFORM: ${{matrix.platform}}
-      BIN_PATH: D:\a\Shell\Shell\src\bin
+      BIN_PATH: ${{ github.workspace }}\src\bin
     runs-on: windows-latest
 
     steps:
