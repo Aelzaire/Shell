@@ -37,6 +37,8 @@ menu(mode="multiple" title=title.more_options image=icon.more_options)
 {
 }
 
+import 'imports/editors.nss'
+import 'imports/archive.nss'
 import 'imports/terminal.nss'
 import 'imports/file-manage.nss'
 import 'imports/develop.nss'

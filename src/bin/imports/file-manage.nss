@@ -16,6 +16,21 @@
 	item(mode="single" type="file" title=loc.change_extension image=\uE0B5 cmd=if(input(loc.change_extension, "Type extension"),
 		io.rename(sel.path, path.join(sel.dir, sel.file.title + "." + input.result))))
 
+	menu(mode="single" type='file' title=loc.copy_hash image=icon.copy_path)
+	{
+		// Computed by PowerShell's Get-FileHash and placed on the clipboard.
+		$hash_ps = sys.bin + '\WindowsPowerShell\v1.0\powershell.exe'
+		$hash_path = str.replace(sel.path, "'", "''")
+		item(title='SHA-256' window=hidden cmd=hash_ps
+			args=`-NoProfile -NonInteractive -Command "(Get-FileHash -LiteralPath '@hash_path' -Algorithm SHA256).Hash | Set-Clipboard"`)
+		item(title='SHA-1' window=hidden cmd=hash_ps
+			args=`-NoProfile -NonInteractive -Command "(Get-FileHash -LiteralPath '@hash_path' -Algorithm SHA1).Hash | Set-Clipboard"`)
+		item(title='SHA-512' window=hidden cmd=hash_ps
+			args=`-NoProfile -NonInteractive -Command "(Get-FileHash -LiteralPath '@hash_path' -Algorithm SHA512).Hash | Set-Clipboard"`)
+		item(title='MD5' window=hidden cmd=hash_ps
+			args=`-NoProfile -NonInteractive -Command "(Get-FileHash -LiteralPath '@hash_path' -Algorithm MD5).Hash | Set-Clipboard"`)
+	}
+
 	menu(separator="after" image=\uE290 title=title.select)
 	{
 		item(title=loc.all image=icon.select_all cmd=command.select_all)

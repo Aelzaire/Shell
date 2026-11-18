@@ -12,6 +12,21 @@ develop="&Develop"
 editors="editors"
 windows_notepad="Windows notepad"
 
+// editors.nss
+edit_with_notepadpp="Edit with Notepad++"
+open_folder_in_notepadpp="Open folder in Notepad++"
+tip_shift_admin="Hold SHIFT to run as administrator"
+
+// archive.nss
+compress_to="Compress to"
+zip_file="ZIP file"
+seven_zip_file="7z file"
+tar_file="TAR file"
+extract_here="Extract here"
+extract_to="Extract to"
+archive_failed="The archive could not be created."
+extract_failed="The archive could not be extracted."
+
 // file-manage.nss
 file_manage="File manage"
 copy_multiple_paths='Copy (@sel.count) items selected'
@@ -19,6 +34,7 @@ all="All"
 invert="Invert"
 none="None"
 change_extension="Change extension"
+copy_hash="Copy hash"
 take_ownership="Take ownership"
 show_hide="Show/Hide"
 system_files="System files"
