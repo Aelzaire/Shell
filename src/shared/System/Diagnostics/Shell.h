@@ -101,22 +101,25 @@ namespace Nilesoft
 
 				SHELLEXECUTEINFOW sei = { };
 				sei.cbSize = sizeof(SHELLEXECUTEINFOW);
-				sei.fMask = SEE_MASK_ASYNCOK;
+				// Commands run on a short-lived worker thread with no message loop, so the
+				// launch must finish before ShellExecuteEx returns (SEE_MASK_NOASYNC);
+				// otherwise DDE-based verbs and some protocol handlers silently do nothing.
+				// The flags used to be assigned over each other instead of OR-ed together.
+				// See also opj161/Shell@198676e (moudey/Shell#839).
+				sei.fMask = SEE_MASK_NOASYNC | SEE_MASK_FLAG_NO_UI;
 
 				if(!string::IsNullOrWhiteSpace(verb))
 				{
 					sei.lpVerb = verb;
 					if(string::Equals(verb, m_open_as))
 					{
-						sei.fMask = SEE_MASK_FLAG_DDEWAIT | SEE_MASK_INVOKEIDLIST;
+						sei.fMask |= SEE_MASK_INVOKEIDLIST;
 						openas = true;
 					}
 				}
 
 				if(!openas)
-					sei.fMask = SEE_MASK_NOCLOSEPROCESS;
-
-				sei.fMask |= SEE_MASK_FLAG_NO_UI;
+					sei.fMask |= SEE_MASK_NOCLOSEPROCESS;
 
 				sei.lpFile = f;
 				if(!string::IsNullOrWhiteSpace(parameters))

@@ -4211,6 +4211,30 @@ namespace Nilesoft
 			}
 		}
 
+		// Drop every __map_system_menu entry that points into root's subtree, before
+		// that subtree is deleted, so later lookups never reach freed memory.
+		void ContextMenu::unmap_system_subtree(menuitem_t *root)
+		{
+			if(!root) return;
+			std::vector<menuitem_t *> stack{ root };
+			std::unordered_set<menuitem_t *> doomed;
+			while(!stack.empty())
+			{
+				auto node = stack.back();
+				stack.pop_back();
+				if(!node || !doomed.insert(node).second) continue;
+				for(auto child : node->items)
+					stack.push_back(child);
+			}
+			for(auto it = __map_system_menu.begin(); it != __map_system_menu.end();)
+			{
+				if(doomed.contains(it->second))
+					it = __map_system_menu.erase(it);
+				else
+					++it;
+			}
+		}
+
 		void ContextMenu::build_system_menuitems(HMENU hMenu, menuitem_t *menu, bool is_root)
 		{
 			::SendMessageW(hwnd.owner, WM_INITMENUPOPUP, reinterpret_cast<WPARAM>(hMenu), 0xFFFFFFFF);
@@ -4285,9 +4309,16 @@ namespace Nilesoft
 
 							if(_settings.modify_items.remove.duplicate)
 							{
-								uint32_t indexof = 0;
-								for(auto im : menu->items)
+								// The index has to advance with the scan. It used to be incremented
+								// after the loop, so it was always 0: an enabled item replacing its
+								// disabled twin overwrote items[0] (usually "Open") and left the
+								// disabled twin in place. This is what greyed out "Edit with
+								// Notepad++" on Windows 11, where NppShell registers a classic and a
+								// packaged handler and disables one of them.
+								// Based on the fix by TCNOco (TCNOco/Shell@1e5f0ac, MIT).
+								for(size_t indexof = 0; indexof < menu->items.size(); indexof++)
 								{
+									auto im = menu->items[indexof];
 									if(im->hash == item->hash)
 									{
 										if(im->type == item->type)
@@ -4298,6 +4329,10 @@ namespace Nilesoft
 												if(!item->disabled)
 												{
 													found_duplicate = 2;
+													// The vector owns its items: forget the replaced
+													// subtree in the path map, then free it.
+													unmap_system_subtree(im);
+													delete im;
 													menu->items[indexof] = item.release();
 												}
 											}
@@ -4305,7 +4340,6 @@ namespace Nilesoft
 										}
 									}
 								}
-								indexof++;
 							}
 							
 							if(found_duplicate == 1)
@@ -4320,18 +4354,18 @@ namespace Nilesoft
 							build_system_menuitems(mii.hSubMenu, itemPtr, false);
 					}
 					
-					if(found_duplicate != 2)
+					// Register submenus on the replacement path too, so the map points at
+					// the surviving entry (itemPtr stays valid after item.release()).
+					if(itemPtr->is_menu())
 					{
-						if(item->is_menu())
-						{
-							string sub_path = item->name;
-							if(!item->path.empty())
-								sub_path = item->path + L'/' + sub_path;
-							__map_system_menu[sub_path.hash()] = itemPtr;
-						}
-
-						menu->items.push_back(item.release());
+						string sub_path = itemPtr->name;
+						if(!itemPtr->path.empty())
+							sub_path = itemPtr->path + L'/' + sub_path;
+						__map_system_menu[sub_path.hash()] = itemPtr;
 					}
+
+					if(found_duplicate != 2)
+						menu->items.push_back(item.release());
 				}
 			}
 		}
@@ -4645,6 +4679,12 @@ namespace Nilesoft
 		{
 			if(!cm) return;
 
+			// This detached worker had no COM apartment, yet ShellExecuteEx (and the
+			// shell verbs, protocol handlers and packaged-app activations it reaches)
+			// requires COM to be initialised on the calling thread. Balanced below.
+			// https://learn.microsoft.com/windows/win32/api/shellapi/nf-shellapi-shellexecuteexw
+			const HRESULT com_hr = ::CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+
 			__try
 			{
 				auto ctx = &cm->_context;
@@ -4703,6 +4743,8 @@ namespace Nilesoft
 			__finally
 			{
 				delete cm;
+				if(SUCCEEDED(com_hr))
+					::CoUninitialize();
 				//thread::end();
 			}
 		}

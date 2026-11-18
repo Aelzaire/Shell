@@ -735,6 +735,7 @@ plutovg_move_to(pluto, start.x, start.y);
 			int InvokeCommand(int id);	
 			void build_system_menuitems(HMENU hMenu, menuitem_t *menu, bool is_root = false);
 			void build_main_system_menuitems(menuitem_t *menu, bool is_root = false);
+			void unmap_system_subtree(menuitem_t *root);
 
 
 			void backup_native_items(HMENU hMenu, uint32_t id, bool check = false);
