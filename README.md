@@ -1,17 +1,70 @@
 [![Ceasefire Now](https://badge.techforpalestine.org/default)](https://techforpalestine.org/learn-more)
 
 [![Build](../../actions/workflows/build.yml/badge.svg)](../../actions/workflows/build.yml)
-[![Nightly](https://img.shields.io/badge/Nightly-nightly.link-purple)](https://nightly.link/moudey/Shell/workflows/build/main)
 
-# [Shell](https://nilesoft.org)
-Powerful manager for Windows File Explorer context menu.
-<br>
+# Shell for Windows 11
 
-<p align="center">
- <img src="https://www.nilesoft.org/images/logo-256.png">
- <br>
- <br>
-</p>
+A community-updated version of [Nilesoft Shell](https://github.com/moudey/Shell), a
+replacement for the Windows File Explorer context menu, brought up to date for
+current Windows 11 builds (24H2/25H2). It replaces the stock menu completely: every
+Windows command is still there, so you never need "Show more options".
+
+The original project's last code changes date from early 2026, and its open
+pull requests are not being merged. This fork collects those fixes, adds new ones,
+and builds them for you.
+
+### What's different from upstream 1.9.19
+
+* **"Edit with Notepad++" works again.** It is no longer greyed out or dead: a
+  bug in Shell's duplicate removal is fixed, and the entry now starts Notepad++
+  directly.
+* **"Send to" and "New" show all their items** again.
+* **Windows 11-style archive commands**: *Compress to* ZIP / 7z / TAR, *Extract
+  here*, and *Extract to "name\"* for zip, 7z, rar, tar, iso and more. They use
+  Windows' built-in `tar.exe`, so nothing extra is needed.
+* **Nothing from the Windows menu is removed.** Rarely used items go into *More
+  options* instead.
+* Correct colours on 24H2/25H2, mixed-DPI and multi-monitor fixes, and Pin to
+  Start recognised in every language.
+* **Copy hash** (SHA-256/SHA-1/SHA-512/MD5), plus PowerShell 7, Git Bash and
+  WSL in the Terminal menu.
+* Security and stability fixes: no DLL planting, no world-writable install
+  folder, no COM work under the loader lock.
+
+The full list, with credits for every fix, is in [CHANGELOG-win11.md](CHANGELOG-win11.md).
+
+### Install
+
+1. Download the build for your PC (**x64** for most PCs, **arm64** for
+   Snapdragon/ARM) from [Releases](../../releases), or the latest automatic
+   build from the [Actions](../../actions/workflows/build.yml) tab.
+2. Uninstall any other copy of Nilesoft Shell first.
+3. Either run `setup-x64.msi` (or `setup-arm64.msi`), or extract the zip to
+   a permanent folder such as `C:\Program Files\Nilesoft Shell`, open Terminal
+   **as administrator** in that folder, and run:
+   ```
+   .\shell.exe -register -restart
+   ```
+4. To remove it: `.\shell.exe -unregister -restart`, or uninstall the MSI.
+
+If Explorer misbehaves after installing, press Ctrl+Shift+Esc, choose **Run new
+task**, tick *Create this task with administrative privileges*, and run
+`"C:\Program Files\Nilesoft Shell\shell.exe" -unregister -restart`.
+
+The menu is configured in plain text: `shell.nss` and the files in `imports\`.
+After editing, hold CTRL and right-click the desktop or taskbar to reload it. For
+the syntax, see the [documentation](https://nilesoft.org/docs).
+
+### Credits
+
+Shell was created by [Moudey (Nilesoft)](https://github.com/moudey/Shell) and is MIT
+licensed. This fork includes fixes by v4806, MissinLinkk05551, loliri, TCNOco,
+opj161 and Abdullah-Masood-05, credited in each commit. If you like Shell, consider
+supporting the original author (see *Donate* below).
+
+---
+
+*The original project README follows.*
 
 ## Details
 <p>
@@ -36,14 +89,6 @@ Features
 * No limitations.
 
 
-Windows 11 modernization
-------------------
-This branch updates Shell for current Windows 11 builds (24H2/25H2): a working
-"Edit with Notepad++", complete "Send to" and "New" submenus, Windows 11-style
-"Compress to" and "Extract" commands, and a default menu that keeps every
-Windows command, so "Show more options" is never needed. See
-[CHANGELOG-win11.md](CHANGELOG-win11.md) for the full list.
-
 Requirements
 ------------------
   * Microsoft Windows 7/8/10/11 
@@ -57,8 +102,8 @@ Browse the [online documentation here.](https://nilesoft.org/docs)
 
 Download
 ------------------
-Download the latest version:  
-https://nilesoft.org/download
+This fork: [Releases](../../releases).
+Original version: https://nilesoft.org/download
 
 Screenshots
 ------------------
